@@ -1,5 +1,6 @@
 @main def hello: Unit = 
-  println("Hello world!")
-  println(msg)
-
-def msg = "I was compiled by Scala 3. :)"
+  println(JavaString.displayInstance(JavaString.randomGenerate()))
+  println(JavaInt.displayInstance(JavaInt.randomGenerate()))
+  val model = Repetition("j",2,VariableCreation(JavaString,"test",Literal(JavaString, "test")))
+  println(JavaTranslator.translateModel(model))
+  println(CodeExecutor.executeModel(model).getData())
