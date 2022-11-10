@@ -22,8 +22,8 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     Ok(views.html.index())
   }
   
-  def explore() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.explore())
+  def generate() = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.generator())
   }
   
   def tutorial() = Action { implicit request: Request[AnyContent] =>

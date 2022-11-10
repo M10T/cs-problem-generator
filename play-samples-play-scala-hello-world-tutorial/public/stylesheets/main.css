@@ -125,5 +125,41 @@
  dd.info{color:#888;font-size:12px;}
  dd.error{color:#c00;}
  aside a[href^="http"]:after,.doc a[href^="http"]:after{content:url(/assets/images/external.png);vertical-align:middle;margin-left:5px;}
- img.resize{width:44.8px;height74.18px;float:left;}
+ img.resize{width:44.8px;height:74.18px;float:left;}
+ /*input[type="submit"]{margin:5px;padding:5px;border-radius:3px;border:4px}*/
+
+ input[type="submit"] {
+  background-color: #FFFFFF;
+  border: 0;
+  border-radius: .5rem;
+  box-sizing: border-box;
+  color: #111827;
+  font-family: "Inter var",ui-sans-serif,system-ui,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+  font-size: .875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  padding: .75rem 1rem;
+  text-align: center;
+  text-decoration: none #D1D5DB solid;
+  text-decoration-thickness: auto;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  margin: 5px;
+}
+
+input[type="submit"]:hover {
+  background-color: rgb(249,250,251);
+}
+
+input[type="submit"]:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+input[type="submit"]:focus-visible {
+  box-shadow: none;
+}
  
