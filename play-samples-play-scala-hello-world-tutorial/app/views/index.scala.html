@@ -1,0 +1,22 @@
+@()
+
+@main("Home | CS Problem Generator") {
+@defining(play.core.PlayVersion.current) { version =>
+
+<section id="content">
+  <div class="wrapper doc">
+    <article>
+      <h2>Welcome to the CS Problem Generator!</h2>
+      <p>This is made for CS teachers looking to generate problems for their class and CS students looking for practice problems.</p>
+
+      <!--<button>generate problems</button>-->
+      <h3 id="next-steps">Next steps</h3>
+      <p>Now, let's <a href="@routes.HomeController.generate()">generate your first CS problem</a>!</p>
+    </article>
+    <aside>
+      @commonSidebar()
+    </aside>
+  </div>
+</section>
+}
+}
