@@ -1,9 +1,11 @@
 import scala.jdk.CollectionConverters
 import scala.collection.mutable.Map
+import scala.collection.mutable.ListBuffer
 
 class CodeContext(private val outerScope : Option[CodeContext] = None) {
     private val data: Map[String,Any] = Map()
     private val typeData: Map[String, Any] = Map()
+    private val displayedObjects: ListBuffer[String] = ListBuffer()
 
     def createVariable[T](name: String, value: T, varType: Type[T]) = {
         if (outerScope.map(outer=>outer.data.keySet.contains(name)).getOrElse(false))
@@ -11,7 +13,7 @@ class CodeContext(private val outerScope : Option[CodeContext] = None) {
         if (data.keySet.contains(name)) 
             throw IllegalArgumentException("Variable already exists!")
         data.put(name, value)
-        typeData.put(name, typeData)
+        typeData.put(name, varType)
     }
 
     def setVariable[T](name: String, value: T, varType: Type[T]) : Unit = {
@@ -19,8 +21,9 @@ class CodeContext(private val outerScope : Option[CodeContext] = None) {
             return outerScope.get.setVariable(name, value, varType)
         if (!data.keySet.contains(name))
             throw IllegalArgumentException("Variable does not exist!")
-        if(typeData.get(name) != varType) 
+        if(typeData.get(name).get != varType) {
             throw IllegalArgumentException("Variable type does not match!")
+        }
         data.put(name, value)
     }
 
@@ -34,10 +37,21 @@ class CodeContext(private val outerScope : Option[CodeContext] = None) {
             return outerScope.get.getVariable(name, varType)
         else if data.contains(name) && typeData.get(name).get == varType
             then return data.get(name).get.asInstanceOf[T]
-        else throw IllegalArgumentException("Not correct type!")
+        else {
+            throw IllegalArgumentException("Not correct type!")
+        }
+    }
+
+    def addDisplayed(obj: String) : Unit = {
+        if (outerScope.isDefined) outerScope.get.addDisplayed(obj)
+        else displayedObjects.append(obj)
     }
 
     def getData() = data.clone()
+    def getDisplayed : List[String] = 
+        if !outerScope.isDefined 
+            then displayedObjects.toList 
+        else outerScope.get.getDisplayed
 }
 
 object CodeExecutor {
@@ -47,12 +61,16 @@ object CodeExecutor {
     def executeModel(model: CodeModel, context: CodeContext) : CodeContext = {
         model match
             case CodeBlock(sections) => sections.foreach((section)=>executeModel(section, context))
-            case Repetition(variableName, times, section) => {
+            case Repetition(variableName, varType, times, section) => {
                 val forContext = CodeContext(Some(context))
                 var i = 0;
+                forContext.createVariable(variableName, 0, varType)
                 while (i < times) {
                     val innerContext = CodeContext(Some(forContext))
                     executeModel(section, innerContext)
+                    i = forContext.getVariable(variableName, varType)
+                    i += 1
+                    forContext.setVariable(variableName, i, varType)
                 }
             }
             case VariableCreation(variableType, variableName, Literal(varType, value)) if varType==variableType
@@ -63,6 +81,8 @@ object CodeExecutor {
                 => context.setVariable(variableName, value, varType)
             case VariableAssignment(variableName, Variable(otherName, otherType))
                 => context.setVariable(variableName, context.getVariable(otherName, otherType), otherType) 
+            case Display(Literal(vt,value)) => context.addDisplayed(vt.displayInstance(value))
+            case Display(Variable(name, vt)) => context.addDisplayed(vt.displayInstance(context.getVariable(name,vt)))
             case _ => {}
         return context
     }
