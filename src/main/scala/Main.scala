@@ -1,5 +1,6 @@
 @main def hello: Unit = 
-  println("Hello world!")
-  println(msg)
-
-def msg = "I was compiled by Scala 3. :)"
+  val model = JavaTranslator.randomGenerate()
+  println(JavaTranslator.translateModel(model))
+  val executedContext = CodeExecutor.executeModel(model)
+  println("Displayed: " + executedContext.getDisplayed)
+  println("Data: " + executedContext.getData())
