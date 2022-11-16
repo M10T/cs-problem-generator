@@ -23,11 +23,23 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   }
   
   def generate() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.generator())
+    //Ok(views.html.generator())
+    Ok(views.html.generator(ProblemForm.form))
   }
   
   def tutorial() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.tutorial())
   }
   
+  def problemFormPost() = Action { implicit request =>
+    ProblemForm.form.bindFromRequest.fold(
+      formWithErrors => {
+        // binding failure, you retrieve the form containing errors:
+        BadRequest(views.html.generator(formWithErrors))
+      },
+      formData => {
+        Ok(formData.toString)
+      }
+    )
+  }
 }
