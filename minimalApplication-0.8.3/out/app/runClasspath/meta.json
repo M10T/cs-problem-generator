@@ -1,0 +1,31 @@
+{
+    "value": [
+        "ref:c984eca8:/Users/mt/Documents/GitHub Projects/cs-problem-generator/minimalApplication-0.8.3/app/resources",
+        "ref:bfffdb17:/Users/mt/Documents/GitHub Projects/cs-problem-generator/minimalApplication-0.8.3/out/app/compile/dest/classes",
+        "qref:867e779b:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala3-library_3/3.2.1/scala3-library_3-3.2.1.jar",
+        "qref:b75b41e2:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/cask_3/0.8.3/cask_3-0.8.3.jar",
+        "qref:aa01c894:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.10/scala-library-2.13.10.jar",
+        "qref:a45956bb:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/undertow/undertow-core/2.2.3.Final/undertow-core-2.2.3.Final.jar",
+        "qref:f0d0a377:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle_3/1.6.0/upickle_3-1.6.0.jar",
+        "qref:d5785887:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/cask-util_3/0.8.3/cask-util_3-0.8.3.jar",
+        "qref:18086ffd:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/jboss/logging/jboss-logging/3.4.1.Final/jboss-logging-3.4.1.Final.jar",
+        "qref:e63911ab:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/jboss/xnio/xnio-api/3.8.0.Final/xnio-api-3.8.0.Final.jar",
+        "qref:08c36f5b:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/jboss/xnio/xnio-nio/3.8.0.Final/xnio-nio-3.8.0.Final.jar",
+        "qref:fc4a3e14:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/jboss/threads/jboss-threads/3.1.0.Final/jboss-threads-3.1.0.Final.jar",
+        "qref:986a85e8:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/ujson_3/1.6.0/ujson_3-1.6.0.jar",
+        "qref:e52f94ff:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upack_3/1.6.0/upack_3-1.6.0.jar",
+        "qref:21b3e7b7:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle-implicits_3/1.6.0/upickle-implicits_3-1.6.0.jar",
+        "qref:4ceed746:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_3/0.2.7/sourcecode_3-0.2.7.jar",
+        "qref:7a35bb97:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_3/0.6.6/pprint_3-0.6.6.jar",
+        "qref:f3edb1b2:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_3/0.7.1/geny_3-0.7.1.jar",
+        "qref:fc6af18a:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/castor_3/0.1.8/castor_3-0.1.8.jar",
+        "qref:51a56400:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/java-websocket/Java-WebSocket/1.5.0/Java-WebSocket-1.5.0.jar",
+        "qref:c4f1545a:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/wildfly/common/wildfly-common/1.5.2.Final/wildfly-common-1.5.2.Final.jar",
+        "qref:52bf150f:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/wildfly/client/wildfly-client-config/1.0.1.Final/wildfly-client-config-1.0.1.Final.jar",
+        "qref:080e310f:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle-core_3/1.6.0/upickle-core_3-1.6.0.jar",
+        "qref:ea8753bf:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_3/0.2.14/fansi_3-0.2.14.jar",
+        "qref:c4cd0374:/Users/mt/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar"
+    ],
+    "valueHash": 2071224734,
+    "inputsHash": 974032725
+}
