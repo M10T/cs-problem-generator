@@ -1,6 +1,8 @@
 package app
 
 import model._
+import scalatags.Text.all._
+
 
 object MinimalApplication extends cask.MainRoutes{
   @cask.get("/")
@@ -16,11 +18,20 @@ object MinimalApplication extends cask.MainRoutes{
   @cask.get("/random_code") 
   def random_code() = {
     val model = JavaTranslator.randomGenerate()
-    println(JavaTranslator.translateModel(model))
+    val translated = JavaTranslator.translateModel(model)
     val executedContext = CodeExecutor.executeModel(model)
-    println("Displayed: " + executedContext.getDisplayed)
-    println("Data: " + executedContext.getData())
+    val displayed = executedContext.getDisplayed
+    val data = executedContext.getData()
+    html(
+      body(
+        div(b("Code:"),
+          translated.split(";").map(x=>p(x+';'))),
+        br(),
+        p(b("Displayed: "),displayed),
+        p(b("Data: "),data.toString)
+      )
+    )
   }
-
   initialize()
 }
+
