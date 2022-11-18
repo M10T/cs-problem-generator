@@ -12,11 +12,11 @@ object MinimalApplication extends cask.MainRoutes{
       body(
         div(b("Welcome to CS Problem Generator!"),
         br()),
-        form(action:="/form", method:="POST")(
-          input(attr("type"):="checkbox", attr("id"):="problemTypeOne"),
+        form(action:="/do-thing", method:="GET")(
+          input(attr("type"):="checkbox", attr("id"):="problemTypeOne", attr("name"):="problemTypeOne", attr("value"):="problemTypeOne"),
           label(attr("for"):="problemTypeOne")("Problem Type One: Tracing"),
           br(),
-          input(attr("type"):="checkbox", attr("id"):="problemTypeTwo"),
+          input(attr("type"):="checkbox", attr("id"):="problemTypeTwo", attr("name"):="problemTypeTwo", attr("value"):="problemTypeTwo"),
           label(attr("for"):="problemTypeTwo")("Problem Type Two: "),
           br(),
           input(attr("type"):="submit", attr("id"):="submit"),
@@ -25,9 +25,11 @@ object MinimalApplication extends cask.MainRoutes{
     ))
   }
 
-  @cask.post("/do-thing")
-  def doThing(request: cask.Request) = {
-    request.text().reverse
+  @cask.get("/do-thing")
+  def doThing(problemTypeOne: cask.Request, problemTypeTwo: cask.Request) = {
+    html(body(
+      p(problemTypeOne.text()),
+      p("hifisdjfad")))
   }
 
   @cask.get("/random_code") 
@@ -48,10 +50,11 @@ object MinimalApplication extends cask.MainRoutes{
     )
   }
 
+  /*
   @cask.postForm("/form")
   def formEndpoint(value1: cask.FormValue) = {
     "OK " + value1
-  }
+  }*/
 
   initialize()
 }
