@@ -6,8 +6,23 @@ import scalatags.Text.all._
 
 object MinimalApplication extends cask.MainRoutes{
   @cask.get("/")
-  def hello() = {
-    "Hello World!"
+  def welcome() = {
+        doctype("html")(
+    html(
+      body(
+        div(b("Welcome to CS Problem Generator!"),
+        br()),
+        form(action:="/form", method:="POST")(
+          input(attr("type"):="checkbox", attr("id"):="problemTypeOne"),
+          label(attr("for"):="problemTypeOne")("Problem Type One: Tracing"),
+          br(),
+          input(attr("type"):="checkbox", attr("id"):="problemTypeTwo"),
+          label(attr("for"):="problemTypeTwo")("Problem Type Two: "),
+          br(),
+          input(attr("type"):="submit", attr("id"):="submit"),
+        )
+      )
+    ))
   }
 
   @cask.post("/do-thing")
@@ -32,6 +47,11 @@ object MinimalApplication extends cask.MainRoutes{
       )
     )
   }
+
+  @cask.postForm("/form")
+  def formEndpoint(value1: cask.FormValue) = {
+    "OK " + value1
+  }
+
   initialize()
 }
-
