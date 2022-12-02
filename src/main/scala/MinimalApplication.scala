@@ -42,7 +42,7 @@ object MinimalApplication extends cask.MainRoutes{
     html(
       body(
         div(b("Code:"),
-          translated.split(";").map(x=>p(x+';'))),
+          translated.split("\n").map(x=>p(x))),
         br(),
         p(b("Displayed: "),displayed.toString),
         p(b("Data: "),data.toString)
@@ -64,7 +64,7 @@ object MinimalApplication extends cask.MainRoutes{
     html(
       body(
         div(b("Code:"),
-          translated.split(";").map(x=>p(x+';'))),
+          translated.split("\n").map(x=>p(x))),
         br(),
         form(id:="answers",onsubmit:="return answerSubmit('v1')",
           p("What is the first displayed line?"),

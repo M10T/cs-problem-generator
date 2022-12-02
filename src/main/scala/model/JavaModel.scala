@@ -45,8 +45,8 @@ object JavaTranslator extends ModelTranslator {
         }
     }
 
-    def randomGenerateHelper(vars: Map[String, Any], blockAllowed: Boolean = true) : CodeModel = {
-        val code = if blockAllowed then randGenerator.nextInt(3) else randGenerator.nextInt(2)
+    def randomGenerateHelper(vars: Map[String, Any], codeBound : Int = 4) : CodeModel = {
+        val code = randGenerator.nextInt(codeBound)
         return code match
             case 0 => Display(randomType(vars))
             case 1 => {
@@ -56,8 +56,15 @@ object JavaTranslator extends ModelTranslator {
                 return VariableCreation(varRef.getType, varName, varRef)
             }
             case 2 => {
+                val newVars = vars.clone()
+                val times : Int = randGenerator.between(2,6)
+                val varName = "i" + vars.keySet.count(name=>name.startsWith("i"))
+                vars.put(varName, JavaInt)
+                return Repetition(varName, JavaInt, times, randomGenerateHelper(newVars))
+            }
+            case 3 => {
                 val blockLength = randGenerator.between(1,10)
-                return CodeBlock((0 to blockLength map {(_:Int)=>randomGenerateHelper(vars,blockAllowed=false)}).toList)
+                return CodeBlock((0 to blockLength map {(_:Int)=>randomGenerateHelper(vars,codeBound=3)}).toList)
             }
     }
 

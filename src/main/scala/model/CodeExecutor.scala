@@ -3,6 +3,7 @@ package model;
 import scala.jdk.CollectionConverters
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
+import ujson.True
 
 class CodeContext(private val outerScope : Option[CodeContext] = None) {
     private val data: Map[String,Any] = Map()
@@ -33,14 +34,21 @@ class CodeContext(private val outerScope : Option[CodeContext] = None) {
         data.put(name, value)
         typeData.put(name, varType)
     }
+
+    def hasVariable[T](name: String, varType: Type[T]) : Boolean = {
+        if (data.contains(name) && typeData.get(name).get == varType) return true
+        else return outerScope.map(outer=>outer.hasVariable(name, varType)).getOrElse(false)
+    }
     
     def getVariable[T](name: String, varType: Type[T]) : T = {
-        if (outerScope.map(outer=>outer.data.keySet.contains(name)).getOrElse(false))
-            return outerScope.get.getVariable(name, varType)
-        else if (data.contains(name) && typeData.get(name).get == varType)
+        if (!hasVariable(name, varType)) {
+            throw IllegalArgumentException("Not correct type!")
+        }
+    
+        if (data.contains(name) && typeData.get(name).get == varType)
             return data.get(name).get.asInstanceOf[T]
         else {
-            throw IllegalArgumentException("Not correct type!")
+            return outerScope.get.getVariable(name, varType)
         }
     }
 
