@@ -4,6 +4,8 @@ import model._
 import scalatags.Text.all._
 import scala.io.Source
 
+import scala.collection.mutable.ArrayBuffer
+
 object MinimalApplication extends cask.MainRoutes{
   @cask.get("/")
   def welcome() = {
@@ -60,21 +62,34 @@ object MinimalApplication extends cask.MainRoutes{
     val executedContext = CodeExecutor.executeModel(model)
     val displayed = executedContext.getDisplayed
     val data = executedContext.getData()
-    val firstDisplayed = if displayed.isEmpty then "N/A" else s"${displayed(0)}"
+    val r = scala.util.Random
+    val answerIndex = r.nextInt(4) + 1
+    val answer = if displayed.isEmpty then "N/A" else s"${displayed(0)}"
+
+    var options = new ArrayBuffer[String]()
+
+    for( i <- 1 to 4){
+        if (i == answerIndex) {
+            options += answer
+        } else {
+            options += JavaString.randomGenerate()
+        }
+      }
+
     html(
       body(
         div(b("Code:"),
           translated.split("\n").map(x=>p(x))),
         br(),
-        form(id:="answers",onsubmit:="return answerSubmit('v1')",
+        form(id:="answers", onsubmit:="return answerSubmit('v" + answerIndex + "')",
           p("What is the first displayed line?"),
-          input(tpe:="radio", name:="answers", value:="v1", firstDisplayed),
+          input(tpe:="radio", name:="answers", value:="v1", options(0)),
           br(),
-          input(tpe:="radio", name:="answers", value:="v2", JavaString.randomGenerate()),
+          input(tpe:="radio", name:="answers", value:="v2", options(1)),
           br(),
-          input(tpe:="radio", name:="answers", value:="v3", JavaString.randomGenerate()),
+          input(tpe:="radio", name:="answers", value:="v3", options(2)),
           br(),
-          input(tpe:="radio", name:="answers", value:="v4", JavaString.randomGenerate()),
+          input(tpe:="radio", name:="answers", value:="v4", options(3)),
           br(),
           input(tpe:="submit")
         ),
