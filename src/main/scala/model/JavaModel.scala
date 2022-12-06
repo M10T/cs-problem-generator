@@ -8,7 +8,7 @@ object JavaString extends Type[String]("String"){
         val length : Int = randomGenerator.nextInt(10) + 1;
         return randomGenerator.alphanumeric.take(length).mkString
     }
-    def displayInstance(obj: String): String = '"'+obj+'"'
+    def displayInstance(obj: String): String = obj
 }
 
 object JavaInt extends Type[Int]("int"){
@@ -30,9 +30,13 @@ object JavaTranslator extends ModelTranslator {
             => variableName + " = " + translateModel(ref) + ";"
         case Literal(variableType, variableValue) => variableType.displayInstance(variableValue)
         case Variable(variableName, variableType) => variableName
+        case Addition(r1, r2) => s"(${translateModel(r1)} + ${translateModel(r2)})"
+        case Subtraction(r1, r2) => s"(${translateModel(r1)} - ${translateModel(r2)})"
+        case Multiplication(r1, r2) => s"(${translateModel(r1)} * ${translateModel(r2)})"
+        case Division(r1, r2) => s"(${translateModel(r1)} / ${translateModel(r2)})"
         case Display(ref) => f"System.out.println(${translateModel(ref)});"
 
-    def randomType(vars: Map[String, Any]) : Reference = {
+    def randomType(vars: Map[String, Any]) : Reference[?] = {
         val literal = randGenerator.nextBoolean()
         if(vars.isEmpty || literal) {
             val types = Array(JavaString, JavaInt);
@@ -59,7 +63,7 @@ object JavaTranslator extends ModelTranslator {
                 val newVars = vars.clone()
                 val times : Int = randGenerator.between(2,6)
                 val varName = "i" + vars.keySet.count(name=>name.startsWith("i"))
-                vars.put(varName, JavaInt)
+                newVars.put(varName, JavaInt)
                 return Repetition(varName, JavaInt, times, randomGenerateHelper(newVars))
             }
             case 3 => {

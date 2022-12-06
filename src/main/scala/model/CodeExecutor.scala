@@ -42,7 +42,7 @@ class CodeContext(private val outerScope : Option[CodeContext] = None) {
     
     def getVariable[T](name: String, varType: Type[T]) : T = {
         if (!hasVariable(name, varType)) {
-            throw IllegalArgumentException("Not correct type!")
+            throw IllegalArgumentException(s"Not correct type $varType for variable $name!")
         }
     
         if (data.contains(name) && typeData.get(name).get == varType)
@@ -66,7 +66,17 @@ class CodeContext(private val outerScope : Option[CodeContext] = None) {
 
 object CodeExecutor {
 
-    def executeModel(model: CodeModel) : CodeContext = executeModel(model, CodeContext())
+    def executeModel(model: CodeModel) : CodeContext = {
+        try { 
+            return executeModel(model, CodeContext())
+        } catch {
+            case e: IllegalArgumentException => {
+                println(JavaTranslator.translateModel(model))
+                return CodeContext()
+            }
+            
+        }
+    }
 
     def executeModel(model: CodeModel, context: CodeContext) : CodeContext = {
         model match

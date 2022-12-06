@@ -64,7 +64,8 @@ object MinimalApplication extends cask.MainRoutes{
     val data = executedContext.getData()
     val r = scala.util.Random
     val answerIndex = r.nextInt(4) + 1
-    val answer = if displayed.isEmpty then "N/A" else s"${displayed(0)}"
+    val line = if displayed.isEmpty then 1 else r.nextInt(displayed.size) + 1
+    val answer = if displayed.isEmpty then "N/A" else displayed(line - 1)
 
     var options = new ArrayBuffer[String]()
 
@@ -75,6 +76,7 @@ object MinimalApplication extends cask.MainRoutes{
             options += JavaString.randomGenerate()
         }
       }
+    println(options)
 
     html(
       body(
@@ -82,7 +84,7 @@ object MinimalApplication extends cask.MainRoutes{
           translated.split("\n").map(x=>p(x))),
         br(),
         form(id:="answers", onsubmit:="return answerSubmit('v" + answerIndex + "')",
-          p("What is the first displayed line?"),
+          p(s"What is displayed line #${line}?"),
           input(tpe:="radio", name:="answers", value:="v1", options(0)),
           br(),
           input(tpe:="radio", name:="answers", value:="v2", options(1)),
