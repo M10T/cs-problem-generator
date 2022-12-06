@@ -78,6 +78,11 @@ object CodeExecutor {
         }
     }
 
+    def getValue[T](context: CodeContext, ref: Reference[T]) : T = ref match
+        case Literal(variableType, variableValue) => variableValue
+        case Variable(variableName, variableType) => context.getVariable(variableName, variableType)
+    
+
     def executeModel(model: CodeModel, context: CodeContext) : CodeContext = {
         model match
             case CodeBlock(sections) => sections.foreach((section)=>executeModel(section, context))
@@ -93,16 +98,11 @@ object CodeExecutor {
                     forContext.setVariable(variableName, i, varType)
                 }
             }
-            case VariableCreation(variableType, variableName, Literal(varType, value)) if varType==variableType
-                => context.createVariable(variableName, value, varType)
-            case VariableCreation(variableType, variableName, Variable(otherName, otherType)) if variableType == otherType
-                => context.createVariable(variableName, context.getVariable(otherName, variableType), variableType)
-            case VariableAssignment(variableName, Literal(varType, value)) 
-                => context.setVariable(variableName, value, varType)
-            case VariableAssignment(variableName, Variable(otherName, otherType))
-                => context.setVariable(variableName, context.getVariable(otherName, otherType), otherType) 
-            case Display(Literal(vt,value)) => context.addDisplayed(vt.displayInstance(value))
-            case Display(Variable(name, vt)) => context.addDisplayed(vt.displayInstance(context.getVariable(name,vt)))
+            case VariableCreation(variableType, variableName, ref)
+                => context.createVariable(variableName, getValue(context, ref), ref.getType)
+            case VariableAssignment(variableName, ref) 
+                => context.setVariable(variableName, getValue(context, ref), ref.getType)
+            case Display(ref) => context.addDisplayed(ref.getType.displayInstance(getValue(context, ref)))
             case _ => {}
         return context
     }

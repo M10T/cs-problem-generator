@@ -76,7 +76,6 @@ object MinimalApplication extends cask.MainRoutes{
             options += JavaString.randomGenerate()
         }
       }
-    println(options)
 
     html(
       body(

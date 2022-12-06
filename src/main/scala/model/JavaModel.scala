@@ -9,12 +9,14 @@ object JavaString extends Type[String]("String"){
         return randomGenerator.alphanumeric.take(length).mkString
     }
     def displayInstance(obj: String): String = obj
+    def codeInstance(obj: String): String = "\"" + obj + "\""
 }
 
 object JavaInt extends Type[Int]("int"){
     private val randomGenerator: Random = new Random()
     def randomGenerate(): Int = randomGenerator.nextInt(100)
     def displayInstance(obj: Int): String = obj.toString()
+    def codeInstance(obj: Int) = displayInstance(obj)
 }
 
 object JavaTranslator extends ModelTranslator {
@@ -28,7 +30,7 @@ object JavaTranslator extends ModelTranslator {
             => variableType.name + " " + variableName + " = " + translateModel(ref) + ";"
         case VariableAssignment(variableName, ref)
             => variableName + " = " + translateModel(ref) + ";"
-        case Literal(variableType, variableValue) => variableType.displayInstance(variableValue)
+        case Literal(variableType, variableValue) => variableType.codeInstance(variableValue)
         case Variable(variableName, variableType) => variableName
         case Addition(r1, r2) => s"(${translateModel(r1)} + ${translateModel(r2)})"
         case Subtraction(r1, r2) => s"(${translateModel(r1)} - ${translateModel(r2)})"

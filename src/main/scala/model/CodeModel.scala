@@ -33,6 +33,7 @@ case class Division[T <: Number](ref1: Reference[T], ref2: Reference[T])  extend
 
 trait Type[T](val name: String) {
     def displayInstance(obj: T): String
+    def codeInstance(obj: T) : String
     def randomGenerate() : T
 }
 
