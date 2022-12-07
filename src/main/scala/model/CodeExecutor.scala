@@ -3,6 +3,7 @@ package model;
 import scala.jdk.CollectionConverters
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
+import ujson.True
 
 class CodeContext(private val outerScope : Option[CodeContext] = None) {
     private val data: Map[String,Any] = Map()
@@ -33,14 +34,21 @@ class CodeContext(private val outerScope : Option[CodeContext] = None) {
         data.put(name, value)
         typeData.put(name, varType)
     }
+
+    def hasVariable[T](name: String, varType: Type[T]) : Boolean = {
+        if (data.contains(name) && typeData.get(name).get == varType) return true
+        else return outerScope.map(outer=>outer.hasVariable(name, varType)).getOrElse(false)
+    }
     
     def getVariable[T](name: String, varType: Type[T]) : T = {
-        if (outerScope.map(outer=>outer.data.keySet.contains(name)).getOrElse(false))
-            return outerScope.get.getVariable(name, varType)
-        else if (data.contains(name) && typeData.get(name).get == varType)
+        if (!hasVariable(name, varType)) {
+            throw IllegalArgumentException(s"Not correct type $varType for variable $name!")
+        }
+    
+        if (data.contains(name) && typeData.get(name).get == varType)
             return data.get(name).get.asInstanceOf[T]
         else {
-            throw IllegalArgumentException("Not correct type!")
+            return outerScope.get.getVariable(name, varType)
         }
     }
 
@@ -58,7 +66,22 @@ class CodeContext(private val outerScope : Option[CodeContext] = None) {
 
 object CodeExecutor {
 
-    def executeModel(model: CodeModel) : CodeContext = executeModel(model, CodeContext())
+    def executeModel(model: CodeModel) : CodeContext = {
+        try { 
+            return executeModel(model, CodeContext())
+        } catch {
+            case e: IllegalArgumentException => {
+                println(JavaTranslator.translateModel(model))
+                return CodeContext()
+            }
+            
+        }
+    }
+
+    def getValue[T](context: CodeContext, ref: Reference[T]) : T = ref match
+        case Literal(variableType, variableValue) => variableValue
+        case Variable(variableName, variableType) => context.getVariable(variableName, variableType)
+    
 
     def executeModel(model: CodeModel, context: CodeContext) : CodeContext = {
         model match
@@ -75,16 +98,11 @@ object CodeExecutor {
                     forContext.setVariable(variableName, i, varType)
                 }
             }
-            case VariableCreation(variableType, variableName, Literal(varType, value)) if varType==variableType
-                => context.createVariable(variableName, value, varType)
-            case VariableCreation(variableType, variableName, Variable(otherName, otherType)) if variableType == otherType
-                => context.createVariable(variableName, context.getVariable(otherName, variableType), variableType)
-            case VariableAssignment(variableName, Literal(varType, value)) 
-                => context.setVariable(variableName, value, varType)
-            case VariableAssignment(variableName, Variable(otherName, otherType))
-                => context.setVariable(variableName, context.getVariable(otherName, otherType), otherType) 
-            case Display(Literal(vt,value)) => context.addDisplayed(vt.displayInstance(value))
-            case Display(Variable(name, vt)) => context.addDisplayed(vt.displayInstance(context.getVariable(name,vt)))
+            case VariableCreation(variableType, variableName, ref)
+                => context.createVariable(variableName, getValue(context, ref), ref.getType)
+            case VariableAssignment(variableName, ref) 
+                => context.setVariable(variableName, getValue(context, ref), ref.getType)
+            case Display(ref) => context.addDisplayed(ref.getType.displayInstance(getValue(context, ref)))
             case _ => {}
         return context
     }
