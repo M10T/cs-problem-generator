@@ -126,8 +126,10 @@ object MinimalApplication extends cask.MainRoutes{
       }
     }
 
+    var testString = "<"
+
     html(
-      body(onload:="renderQuestions('" + problemsString + "')")(
+      body(onload:="renderQuestions(`" + problems(0)(0) + "`)")(
         div(numberOfProblems),
         br(),
         //div(problemsString), 
