@@ -90,7 +90,7 @@ object MinimalApplication extends cask.MainRoutes{
     } */
 
     val r = scala.util.Random
-    var problems = Array.ofDim[String](numberOfProblems, 5) // new Array[String](numberOfProblems) // scala.collection.mutable.Map[String, Any]()
+    var problems = Array.ofDim[String](numberOfProblems, 6) // new Array[String](numberOfProblems) // scala.collection.mutable.Map[String, Any]()
 
     for (i <- 1 to numberOfProblems){
       val model = JavaTranslator.randomGenerate()
@@ -105,6 +105,7 @@ object MinimalApplication extends cask.MainRoutes{
       // val problem = new Array[String](5)
 
       problems(i-1)(0) = translated
+      problems(i-1)(5) = answerIndex.toString()
 
       for(j <- 1 to 4){
         if (j == answerIndex) {
@@ -119,16 +120,12 @@ object MinimalApplication extends cask.MainRoutes{
     for (i <- 1 to numberOfProblems){
       problemsString += problems(i-1).mkString("|")
       if (i != numberOfProblems) {
-        problemsString += "|"
+        problemsString += "|||"
       }
     }
 
-    var testString = "<"
-
     html(
-      body(onload:="renderQuestions(`" + problems(0)(0) + "`)")(
-        div(numberOfProblems),
-        br(),
+      body(onload:="renderQuestions(`" + problemsString + "`)")(
         //div(problemsString), 
         /*
         div(b("Code:"),
