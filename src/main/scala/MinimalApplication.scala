@@ -61,39 +61,8 @@ object MinimalApplication extends cask.MainRoutes{
 
   @cask.get("/trace")
   def trace(numberOfProblems: Int) = {
-    /*
     val r = scala.util.Random
-    val problems = new ArrayBuffer[Any]() // scala.collection.mutable.Map[String, Any]()
-
-    for (i <- 0 to numberOfProblems){
-      val model = JavaTranslator.randomGenerate()
-      val translated = JavaTranslator.translateModel(model)
-      val executedContext = CodeExecutor.executeModel(model)
-      val displayed = executedContext.getDisplayed
-      val data = executedContext.getData()
-      val answerIndex = r.nextInt(4) + 1
-      val answer = if displayed.isEmpty then "N/A" else s"${displayed(0)}"
-
-      var answerChoices = new ArrayBuffer[String]()
-
-      for(i <- 1 to 4){
-        if (i == answerIndex) {
-          answerChoices += answer
-        } else {
-          answerChoices += JavaString.randomGenerate()
-        }
-      }
-
-      val problem = scala.collection.mutable.Map[String, Any]()
-
-      problem += ("problemStatement" -> translated)
-      problem += ("answerChoices" -> answerChoices)
-
-      problems += problem
-    } */
-
-    val r = scala.util.Random
-    var problems = Array.ofDim[String](numberOfProblems, 6) // new Array[String](numberOfProblems) // scala.collection.mutable.Map[String, Any]()
+    var problems = Array.ofDim[String](numberOfProblems, 7) // new Array[String](numberOfProblems) // scala.collection.mutable.Map[String, Any]()
 
     for (i <- 1 to numberOfProblems){
       val model = JavaTranslator.randomGenerate()
@@ -101,6 +70,7 @@ object MinimalApplication extends cask.MainRoutes{
       val executedContext = CodeExecutor.executeModel(model)
       val displayed = executedContext.getDisplayed
       val data = executedContext.getData()
+      val line = if displayed.isEmpty then 1 else r.nextInt(displayed.size) + 1
       val answerIndex = r.nextInt(4) + 1
       val answer = if displayed.isEmpty then "N/A" else s"${displayed(0)}"
 
@@ -108,7 +78,8 @@ object MinimalApplication extends cask.MainRoutes{
       // val problem = new Array[String](5)
 
       problems(i-1)(0) = translated
-      problems(i-1)(5) = answerIndex.toString()
+      problems(i-1)(5) = line.toString()
+      problems(i-1)(6) = answerIndex.toString()
 
       for(j <- 1 to 4){
         if (j == answerIndex) {
