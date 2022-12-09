@@ -90,7 +90,7 @@ object MinimalApplication extends cask.MainRoutes{
     } */
 
     val r = scala.util.Random
-    val problems = new ArrayBuffer[Any]() // scala.collection.mutable.Map[String, Any]()
+    var problems = Array.ofDim[String](numberOfProblems, 5) // new Array[String](numberOfProblems) // scala.collection.mutable.Map[String, Any]()
 
     for (i <- 1 to numberOfProblems){
       val model = JavaTranslator.randomGenerate()
@@ -101,30 +101,33 @@ object MinimalApplication extends cask.MainRoutes{
       val answerIndex = r.nextInt(4) + 1
       val answer = if displayed.isEmpty then "N/A" else s"${displayed(0)}"
 
-      var answerChoices = new ArrayBuffer[String]()
+      // var answerChoices = new Array[String](4)
+      // val problem = new Array[String](5)
 
-      for(i <- 1 to 4){
-        if (i == answerIndex) {
-          answerChoices += answer
+      problems(i-1)(0) = translated
+
+      for(j <- 1 to 4){
+        if (j == answerIndex) {
+          problems(i-1)(answerIndex) = answer
         } else {
-          answerChoices += JavaString.randomGenerate()
+          problems(i-1)(j) =  JavaString.randomGenerate()
         }
       }
-
-      val problem = new ArrayBuffer[Any]() 
-
-      problem += translated
-      problem += answerChoices
-
-      problems += problem
     }
 
-    val hi = "haskfjakljdf"
+    var problemsString = ""
+    for (i <- 1 to numberOfProblems){
+      problemsString += problems(i-1).mkString("|")
+      if (i != numberOfProblems) {
+        problemsString += "|"
+      }
+    }
 
     html(
-      body(onload:="renderQuestions('" + problems + "')")(
+      body(onload:="renderQuestions('" + problemsString + "')")(
         div(numberOfProblems),
-        br(), 
+        br(),
+        //div(problemsString), 
         /*
         div(b("Code:"),
           translated.split("\n").map(x=>p(x))),
