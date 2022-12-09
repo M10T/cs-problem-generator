@@ -3,8 +3,11 @@ package app
 import model._
 import scalatags.Text.all._
 import scala.io.Source
+import cask.Response
+import cask.Request
 
 import scala.collection.mutable.ArrayBuffer
+import scalatags.generic.TypedTag
 
 object MinimalApplication extends cask.MainRoutes{
   @cask.get("/")
@@ -29,10 +32,10 @@ object MinimalApplication extends cask.MainRoutes{
   }
 
   @cask.get("/problemTypeSelector")
-  def problemTypeSelector(problemType: String, numberOfProblems: Int) = problemType match
-    case "randomCode" => cask.Redirect("/randomCode")
-    case "trace" => cask.Redirect(s"/trace?numberOfProblems=$numberOfProblems")
-    case _ => cask.Abort(404)
+  def problemTypeSelector(problemType: String, numberOfProblems: Int = 1) = problemType match
+    case "randomCode" => cask.Response(randomCode())
+    case "trace" => cask.Response(trace(numberOfProblems))
+    case _ => cask.Response(html(), 401)
   
 
   @cask.get("/randomCode") 
