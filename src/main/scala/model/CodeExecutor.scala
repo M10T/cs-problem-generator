@@ -3,7 +3,6 @@ package model;
 import scala.jdk.CollectionConverters
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
-import ujson.True
 
 class CodeContext(private val outerScope : Option[CodeContext] = None) {
     private val data: Map[String,Any] = Map()
@@ -81,7 +80,9 @@ object CodeExecutor {
     def getValue[T](context: CodeContext, ref: Reference[T]) : T = ref match
         case Literal(variableType, variableValue) => variableValue
         case Variable(variableName, variableType) => context.getVariable(variableName, variableType)
-    
+        case op: Addition[T] => op.num.plus(getValue(context, op.ref1), getValue(context, op.ref2))
+        case op: Subtraction[T] => op.num.minus(getValue(context, op.ref1), getValue(context, op.ref2))
+        case op: Multiplication[T] => op.num.times(getValue(context, op.ref1), getValue(context, op.ref2))
 
     def executeModel(model: CodeModel, context: CodeContext) : CodeContext = {
         model match

@@ -35,7 +35,6 @@ object JavaTranslator extends ModelTranslator {
         case Addition(r1, r2) => s"(${translateModel(r1)} + ${translateModel(r2)})"
         case Subtraction(r1, r2) => s"(${translateModel(r1)} - ${translateModel(r2)})"
         case Multiplication(r1, r2) => s"(${translateModel(r1)} * ${translateModel(r2)})"
-        case Division(r1, r2) => s"(${translateModel(r1)} / ${translateModel(r2)})"
         case Display(ref) => f"System.out.println(${translateModel(ref)});"
 
     def randomType(vars: Map[String, Any]) : Reference[?] = {

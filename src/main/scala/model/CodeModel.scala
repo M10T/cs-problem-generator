@@ -17,17 +17,14 @@ case class VariableAssignment[T](variableName: String, ref: Reference[T]) extend
 case class CodeBlock(sections: List[CodeModel]) extends CodeModel
 case class Display(reference: Reference[?]) extends CodeModel
 
-sealed trait MathResult[T <: Number](val resultType: Type[T]) extends Reference[T]
-case class Addition[T <: Number](ref1: Reference[T], ref2: Reference[T])  extends MathResult[T](ref1.getType) {
+sealed trait MathResult[T](val resultType: Type[T])(implicit val num: Numeric[T]) extends Reference[T]
+case class Addition[T](ref1: Reference[T], ref2: Reference[T])(implicit num: Numeric[T])  extends MathResult[T](ref1.getType) {
     if (ref1.getType != ref2.getType) throw IllegalArgumentException("Different types of numbers!")
 }
-case class Subtraction[T <: Number](ref1: Reference[T], ref2: Reference[T])  extends MathResult[T](ref1.getType) {
+case class Subtraction[T](ref1: Reference[T], ref2: Reference[T])(implicit num: Numeric[T]) extends MathResult[T](ref1.getType) {
     if (ref1.getType != ref2.getType) throw IllegalArgumentException("Different types of numbers!")
 }
-case class Multiplication[T <: Number](ref1: Reference[T], ref2: Reference[T])  extends MathResult[T](ref1.getType) {
-    if (ref1.getType != ref2.getType) throw IllegalArgumentException("Different types of numbers!")
-}
-case class Division[T <: Number](ref1: Reference[T], ref2: Reference[T])  extends MathResult[T](ref1.getType) {
+case class Multiplication[T](ref1: Reference[T], ref2: Reference[T])(implicit num: Numeric[T])  extends MathResult[T](ref1.getType) {
     if (ref1.getType != ref2.getType) throw IllegalArgumentException("Different types of numbers!")
 }
 

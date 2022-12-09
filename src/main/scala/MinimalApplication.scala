@@ -37,6 +37,15 @@ object MinimalApplication extends cask.MainRoutes{
     case "trace" => cask.Response(trace(numberOfProblems))
     case _ => cask.Response(html(), 401)
   
+  @cask.get("/mathTest")
+  def mathTest() = {
+    val model = Addition(Literal[Int](JavaInt, 1), Literal[Int](JavaInt, 2))
+    html(
+      body(
+        p()
+      )
+    )
+  }
 
   @cask.get("/randomCode") 
   def randomCode() = {
