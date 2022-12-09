@@ -31,7 +31,7 @@ object MinimalApplication extends cask.MainRoutes{
   @cask.get("/problemTypeSelector")
   def problemTypeSelector(problemType: String, numberOfProblems: Int) = problemType match
     case "randomCode" => cask.Redirect("/randomCode")
-    case "trace" => cask.Redirect("/trace/")
+    case "trace" => cask.Redirect(s"/trace?numberOfProblems=$numberOfProblems")
     case _ => cask.Abort(404)
   
 
@@ -123,8 +123,10 @@ object MinimalApplication extends cask.MainRoutes{
       }
     }
 
+    var testString = "<"
+
     html(
-      body(onload:="renderQuestions('" + problemsString + "')")(
+      body(onload:="renderQuestions(`" + problems(0)(0) + "`)")(
         div(numberOfProblems),
         br(),
         //div(problemsString), 
