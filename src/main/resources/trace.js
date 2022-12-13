@@ -34,5 +34,5 @@ function answerSubmit(answersArr) {
     }
     console.log(windowsMessage);
     window.alert(windowsMessage);
-    return false;
+    return false; 
 }
