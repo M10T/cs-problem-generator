@@ -27,7 +27,7 @@ object MinimalApplication extends cask.MainRoutes{
           input(attr("type"):="radio", attr("id"):="mathCode", attr("name"):="problemType", attr("value"):="mathCode"),
           label(attr("for"):="randomCode")("Random Math Code Generator"),
           br(),
-          input(attr("type"):="number", attr("id"):="numberOfProblems", attr("name"):="numberOfProblems", attr("value"):=""),
+          input(attr("type"):="number", attr("id"):="numberOfProblems", attr("name"):="numberOfProblems", attr("value"):="1", attr("min"):="1"),
           input(attr("type"):="submit", attr("id"):="submit"),
         )
       )
@@ -35,7 +35,7 @@ object MinimalApplication extends cask.MainRoutes{
   }
 
   @cask.get("/problemTypeSelector")
-  def problemTypeSelector(problemType: String, numberOfProblems: Int = 1) = problemType match
+  def problemTypeSelector(problemType: String, numberOfProblems: Int) = problemType match
     case "randomCode" => cask.Response(randomCode())
     case "trace" => cask.Response(trace(numberOfProblems))
     case "mathCode" => cask.Response(mathTest())
