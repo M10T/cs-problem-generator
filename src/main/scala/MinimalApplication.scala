@@ -25,7 +25,15 @@ object MinimalApplication extends cask.MainRoutes{
           label(attr("for"):="randomCode")("Random Code Generator"),
           br(),
           input(attr("type"):="radio", attr("id"):="mathCode", attr("name"):="problemType", attr("value"):="mathCode"),
-          label(attr("for"):="randomCode")("Random Math Code Generator"),
+          label(attr("for"):="mathCode")("Random Math Code Generator"),
+          br(),
+          br(), 
+          input(attr("type"):="radio", attr("id"):="multipleChoice", attr("name"):="responseType", attr("value"):="multipleChoice"),
+          label(attr("for"):="multipleChoice")("Multiple Choice"),
+          br(),
+          input(attr("type"):="radio", attr("id"):="freeResponse", attr("name"):="responseType", attr("value"):="freeResponse"),
+          label(attr("for"):="freeResponse")("Free Response"),
+          br(),
           br(),
           input(attr("type"):="number", attr("id"):="numberOfProblems", attr("name"):="numberOfProblems", attr("value"):="1", attr("min"):="1"),
           input(attr("type"):="submit", attr("id"):="submit"),
@@ -35,9 +43,9 @@ object MinimalApplication extends cask.MainRoutes{
   }
 
   @cask.get("/problemTypeSelector")
-  def problemTypeSelector(problemType: String, numberOfProblems: Int) = problemType match
+  def problemTypeSelector(problemType: String, responseType: String, numberOfProblems: Int) = problemType match
     case "randomCode" => cask.Response(randomCode())
-    case "trace" => cask.Response(trace(numberOfProblems))
+    case "trace" => cask.Response(trace(responseType, numberOfProblems))
     case "mathCode" => cask.Response(mathTest())
     case _ => cask.Response(html(), 401)
   
@@ -81,7 +89,7 @@ object MinimalApplication extends cask.MainRoutes{
   def staticFileRoutes() = "/src/main/resources"
 
   @cask.get("/trace")
-  def trace(numberOfProblems: Int = 1) = {
+  def trace(responseType: String, numberOfProblems: Int = 1) = {
     val r = scala.util.Random
     var problems = Array.ofDim[String](numberOfProblems, 7)
 
@@ -97,7 +105,7 @@ object MinimalApplication extends cask.MainRoutes{
 
       problems(i-1)(0) = translated
       problems(i-1)(5) = line.toString()
-      problems(i-1)(6) = answerIndex.toString()
+      problems(i-1)(6) = answerIndex.toString() // 7th element = line number of answer 
 
       for(j <- 1 to 4){
         if (j == answerIndex) {
@@ -117,7 +125,7 @@ object MinimalApplication extends cask.MainRoutes{
     }
 
     html(
-      body(onload:=s"renderQuestions(`$problemsString`)")(
+      body(onload:=s"renderQuestions(`$problemsString`, `$responseType`)")(
         script(src := "/static/trace.js")
       )
     )
