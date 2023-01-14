@@ -73,7 +73,6 @@ object CodeExecutor {
                 println(JavaTranslator.translateModel(model))
                 return CodeContext()
             }
-            
         }
     }
 
@@ -83,6 +82,15 @@ object CodeExecutor {
         case op: Addition[T] => op.num.plus(getValue(context, op.ref1), getValue(context, op.ref2))
         case op: Subtraction[T] => op.num.minus(getValue(context, op.ref1), getValue(context, op.ref2))
         case op: Multiplication[T] => op.num.times(getValue(context, op.ref1), getValue(context, op.ref2))
+        case FunctionReference(FunctionApplication(fModel, arg), returnType) => fModel match
+            case ObjectMethod(obj, name, method) => method(getValue(context, obj), getValue(context, arg))
+            case ScopedMethod(name, method) => method(getValue(context,arg))
+            case FunctionBuilder(name, argVar, body, returnRef) => {
+                if (argVar.getType != arg.getType) throw IllegalArgumentException("Illegal argument type!")
+                val newContext = new CodeContext()
+                newContext.setVariable(argVar.variableName, getValue(context, arg), arg.getType)
+                return getValue(executeModel(body, newContext), returnRef)
+            }
 
     def executeModel(model: CodeModel, context: CodeContext) : CodeContext = {
         model match

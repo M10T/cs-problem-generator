@@ -1,70 +1,41 @@
-package model;
+package model
 import scala.util.Random
 import scala.collection.mutable.Map
 
-object JavaString extends Type[String]("String"){
+object NativeString extends Type[String]("str") {
     private val randomGenerator: Random = new Random()
     def randomGenerate(): String = {
         val length : Int = randomGenerator.nextInt(10) + 1;
         return randomGenerator.alphanumeric.take(length).mkString
     }
     def displayInstance(obj: String): String = obj
-    def codeInstance(obj: String): String = "\"" + obj + "\""
-    def startsWithProvider(ref: Reference[String]) : ObjectMethod[String, String, Boolean]
-        = ObjectMethod(ref, "startsWith", (s1,s2)=>s1.startsWith(s2))
+    def codeInstance(obj: String) = "\"" + obj + "\""
 }
 
-object JavaInt extends Type[Int]("int"){
+object NativeInteger extends Type[Int]("int") {
     private val randomGenerator: Random = new Random()
     def randomGenerate(): Int = randomGenerator.nextInt(100)
     def displayInstance(obj: Int): String = obj.toString()
     def codeInstance(obj: Int) = displayInstance(obj)
 }
 
-object JavaBoolean extends Type[Boolean]("boolean") {
-    private val randomGenerator : Random = new Random()
-    def randomGenerate() : Boolean = randomGenerator.nextBoolean()
-    def displayInstance(obj: Boolean) = obj.toString()
-    def codeInstance(obj: Boolean) = displayInstance(obj)
-}
-
-object JavaTranslator extends ModelTranslator {
+object NativeTranslator extends ModelTranslator {
     private val randGenerator = new Random()
     def translateModel(model: CodeModel): String = model match
-        case CodeBlock(sections) if sections.isEmpty => ""
         case CodeBlock(sections) => sections.map(translateModel).reduce((a,b)=>a+"\n"+b)
-        case Repetition(variableName, varType, times, section) 
-            => f"for(int $variableName = 0; $variableName < $times; $variableName++) {\n" 
-                + translateModel(section).split("\n").map(x=>"\t"+x).mkString("\n") + "\n}"
         case VariableCreation(variableType, variableName, ref) 
-            => variableType.name + " " + variableName + " = " + translateModel(ref) + ";"
+            => s"def $variableName ${variableType.name} ${translateModel(ref)}"
         case VariableAssignment(variableName, ref)
-            => variableName + " = " + translateModel(ref) + ";"
+            => s"set $variableName ${translateModel(ref)}"
         case Literal(variableType, variableValue) => variableType.codeInstance(variableValue)
         case Variable(variableName, variableType) => variableName
-        case Addition(r1, r2) => s"(${translateModel(r1)} + ${translateModel(r2)})"
-        case Subtraction(r1, r2) => s"(${translateModel(r1)} - ${translateModel(r2)})"
-        case Multiplication(r1, r2) => s"(${translateModel(r1)} * ${translateModel(r2)})"
-        case Display(ref) => f"System.out.println(${translateModel(ref)});"
-        case FunctionApplication(ObjectMethod(obj, name, method), arg) =>
-            f"${translateModel(obj)}.$name(${translateModel(arg)});"
-        case FunctionApplication(ScopedMethod(name, method), arg) => f"$name(${translateModel(arg)});"
-        case FunctionReference(fModel, _) => translateModel(fModel)
-
-    def translateFunction(model: FunctionBuilder[?, ?]) : String = {
-        val returnType : Type[?] = model.returnRef.getType
-        val argType : Type[?] = model.argRef.variableType
-        var ret : String = f"${returnType.name} ${model.name}(${argType.name} ${model.argRef.variableName}) {\n"
-        ret += translateModel(model.body).split("\n").map(x=>"\t"+x).mkString
-        ret += f"return ${translateModel(model.returnRef)};\n"
-        ret += "}"
-        return ret
-    }
+        case Display(ref) => s"disp ${translateModel(ref)}"
+        case _ => ""
 
     def randomType(vars: Map[String, Any]) : Reference[?] = {
         val literal = randGenerator.nextBoolean()
         if(vars.isEmpty || literal) {
-            val types = Array(JavaString, JavaInt);
+            val types = Array(NativeString, NativeInteger);
             val t = types(randGenerator.nextInt(types.length))
             return Literal(t, t.randomGenerate())
         } else {
@@ -88,8 +59,8 @@ object JavaTranslator extends ModelTranslator {
                 val newVars = vars.clone()
                 val times : Int = randGenerator.between(2,6)
                 val varName = "i" + vars.keySet.count(name=>name.startsWith("i"))
-                newVars.put(varName, JavaInt)
-                return Repetition(varName, JavaInt, times, randomGenerateHelper(newVars))
+                newVars.put(varName, NativeInteger)
+                return Repetition(varName, NativeInteger, times, randomGenerateHelper(newVars))
             }
             case 3 => {
                 val blockLength = randGenerator.between(1,10)

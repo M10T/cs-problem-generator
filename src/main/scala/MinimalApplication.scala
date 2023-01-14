@@ -59,6 +59,19 @@ object MinimalApplication extends cask.MainRoutes{
     )
   }
 
+  @cask.get("/customFunctions")
+  def customFunctions() = {
+    val functions = List(CustomMethods.doubleModel)
+    var translated : String = JavaTranslator.translateFunction(CustomMethods.doubleModel)
+    html (
+      body (
+        div(b("Code:")),
+        functions.map(translated=>JavaTranslator.translateFunction(translated).split("\n")
+          .map(x=>p(raw(x.replace("\t","&emsp;"))))),
+      )
+    )
+  }
+
   @cask.get("/randomCode") 
   def randomCode() = {
     val model = JavaTranslator.randomGenerate()
@@ -123,6 +136,7 @@ object MinimalApplication extends cask.MainRoutes{
     )
   }
 
+  println(JavaTranslator.translateFunction(CustomMethods.doubleModel))
   initialize()
   
 }
