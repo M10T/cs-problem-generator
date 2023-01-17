@@ -1,6 +1,7 @@
 package model;
 import scala.util.Random
 import scala.collection.mutable.Map
+import scala.reflect.ClassTag
 
 object JavaString extends Type[String]("String"){
     private val randomGenerator: Random = new Random()
@@ -10,8 +11,15 @@ object JavaString extends Type[String]("String"){
     }
     def displayInstance(obj: String): String = obj
     def codeInstance(obj: String): String = "\"" + obj + "\""
+
     def startsWithProvider(ref: Reference[String]) : ObjectMethod[String, String, Boolean]
         = ObjectMethod(ref, "startsWith", (s1,s2)=>s1.startsWith(s2))
+    def charAtProvider(ref: Reference[String]) : ObjectMethod[String, Int, Char]
+        = ObjectMethod(ref, "charAt", (s, index) => s.charAt(index))
+    def equalsProvider(ref: Reference[String]) : ObjectMethod[String, String, Boolean]
+        = ObjectMethod(ref, "equals", (s1,s2)=>s1.equals(s2))
+    def equalsIgnoreCaseProvider(ref: Reference[String]) : ObjectMethod[String, String, Boolean]
+        = ObjectMethod(ref, "equalsIgnoreCase", (s1,s2)=>s1.equalsIgnoreCase(s2))
 }
 
 object JavaInt extends Type[Int]("int"){
@@ -26,6 +34,32 @@ object JavaBoolean extends Type[Boolean]("boolean") {
     def randomGenerate() : Boolean = randomGenerator.nextBoolean()
     def displayInstance(obj: Boolean) = obj.toString()
     def codeInstance(obj: Boolean) = displayInstance(obj)
+}
+
+object JavaChar extends Type[Char]("char") {
+    private val randomGenerator : Random = new Random()
+    def randomGenerate(): Char = randomGenerator.alphanumeric.head
+    def displayInstance(obj: Char): String = obj.toString()
+    def codeInstance(obj: Char): String = f"'$obj'"
+}
+
+class JavaArray[T](val valueType: Type[T]) extends Type[List[T]](valueType.name+"[]") {
+    private val randomGenerator : Random = new Random()
+
+    def randomGenerate() = {
+        val len : Int = randomGenerator.between(1,6)
+        (1 to len).map(x=>valueType.randomGenerate()).toList
+    }
+    def codeInstance(obj: List[T]): String = f"new ${valueType.name}[]{${obj.map(valueType.codeInstance).mkString(",")}}"
+    def displayInstance(obj: List[T]): String = f"$displayedClassName@${Integer.toHexString(obj.hashCode())}"
+
+    private def displayedClassName : String = "[" + (valueType match {
+        case JavaInt => "I"
+        case JavaString => "java.lang.String"
+        case JavaBoolean => "Z"
+        case JavaChar => "C"
+        case (obj: JavaArray[?]) => obj.displayedClassName
+    })
 }
 
 object JavaTranslator extends ModelTranslator {
@@ -49,7 +83,8 @@ object JavaTranslator extends ModelTranslator {
         case FunctionApplication(ObjectMethod(obj, name, method), arg) =>
             f"${translateModel(obj)}.$name(${translateModel(arg)});"
         case FunctionApplication(ScopedMethod(name, method), arg) => f"$name(${translateModel(arg)});"
-        case FunctionReference(fModel, _) => translateModel(fModel)
+        case FunctionApplication(FunctionBuilder(name, argRef, body, returnRef), arg) => f"$name(${translateModel(arg)});"
+        case FunctionReference(fModel, _) => translateModel(fModel).dropRight(1)
 
     def translateFunction(model: FunctionBuilder[?, ?]) : String = {
         val returnType : Type[?] = model.returnRef.getType

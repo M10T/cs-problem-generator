@@ -27,6 +27,9 @@ object MinimalApplication extends cask.MainRoutes{
           input(attr("type"):="radio", attr("id"):="mathCode", attr("name"):="problemType", attr("value"):="mathCode"),
           label(attr("for"):="mathCode")("Random Math Code Generator"),
           br(),
+          input(attr("type"):="radio", attr("id"):="stringCode", attr("name"):="problemType", attr("value"):="stringCode"),
+          label(attr("for"):="mathCode")("Random String Code Generator"),
+          br(),
           br(), 
           input(attr("type"):="radio", attr("id"):="multipleChoice", attr("name"):="responseType", attr("value"):="multipleChoice"),
           label(attr("for"):="multipleChoice")("Multiple Choice"),
@@ -46,10 +49,11 @@ object MinimalApplication extends cask.MainRoutes{
   }
 
   @cask.get("/problemTypeSelector")
-  def problemTypeSelector(problemType: String, responseType: String, numberOfProblems: Int) = problemType match
+  def problemTypeSelector(problemType: String, responseType: String = "multipleChoice", numberOfProblems: Int = 1) = problemType match
     case "randomCode" => cask.Response(randomCode())
     case "trace" => cask.Response(trace(responseType, numberOfProblems))
     case "mathCode" => cask.Response(mathTest())
+    case "stringCode" => cask.Response(stringTest())
     case _ => cask.Response(html(), 401)
   
   @cask.get("/mathCode")
@@ -66,6 +70,17 @@ object MinimalApplication extends cask.MainRoutes{
         br(),
         p(b("Displayed: "),displayed.toString),
         p(b("Data: "),data.toString)
+      )
+    )
+  }
+
+  @cask.get("/stringCode")
+  def stringTest() = {
+    val translated = JavaTranslator.translateModel(StringGenerator.randomGenerate())
+    html(
+      body(
+        div(b("Code:"),
+          translated.split("\n").map(x=>p(raw(x.replace("\t","&emsp;"))))),
       )
     )
   }
@@ -147,7 +162,6 @@ object MinimalApplication extends cask.MainRoutes{
     )
   }
 
-  println(JavaTranslator.translateFunction(CustomMethods.doubleModel))
   initialize()
   
 }
