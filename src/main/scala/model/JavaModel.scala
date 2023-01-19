@@ -84,7 +84,15 @@ object JavaTranslator extends ModelTranslator {
             f"${translateModel(obj)}.$name(${translateModel(arg)});"
         case FunctionApplication(ScopedMethod(name, method), arg) => f"$name(${translateModel(arg)});"
         case FunctionApplication(FunctionBuilder(name, argRef, body, returnRef), arg) => f"$name(${translateModel(arg)});"
+        case FunctionApplication(Constructor(objType, method), arg) => f"new ${objType.name}(${translateModel(arg)});"
         case FunctionReference(fModel, _) => translateModel(fModel).dropRight(1)
+        case Conditional(condition, body, elseBody) => f"if(${translateModel(condition)}){\n"
+            + translateModel(body).split("\n").map(x=>"\t"+x).mkString("\n") + "\n}" + 
+            (if elseBody.isDefined then "\nelse {\n" + translateModel(elseBody.get).split("\n").map(x=>"\t"+x).mkString("\n") + "\n}" else "")
+        case NegationResult(ref) => f"!(${translateModel(ref)})"
+        case EqualsResult(ref1, ref2, _) => f"(${translateModel(ref1)}) == (${translateModel(ref2)})"
+        case AndResult(ref1, ref2) => f"(${translateModel(ref1)}) && (${translateModel(ref2)})"
+        case OrResult(ref1, ref2) => f"(${translateModel(ref1)}) || (${translateModel(ref2)})"
 
     def translateFunction(model: FunctionBuilder[?, ?]) : String = {
         val returnType : Type[?] = model.returnRef.getType
@@ -99,7 +107,7 @@ object JavaTranslator extends ModelTranslator {
     def randomType(vars: Map[String, Any]) : Reference[?] = {
         val literal = randGenerator.nextBoolean()
         if(vars.isEmpty || literal) {
-            val types = Array(JavaString, JavaInt);
+            val types = Array(JavaString, JavaInt, JavaBoolean);
             val t = types(randGenerator.nextInt(types.length))
             return Literal(t, t.randomGenerate())
         } else {
@@ -109,7 +117,20 @@ object JavaTranslator extends ModelTranslator {
         }
     }
 
-    def randomGenerateHelper(vars: Map[String, Any], codeBound : Int = 4) : CodeModel = {
+    def randomCondition(vars: Map[String, Any], codeBound : Int = 4) : Reference[Boolean] = {
+        val boolVars : List[String] = vars.keySet.toList.filter(s=>vars.getOrElse(s,None) == JavaBoolean)
+        if (boolVars.isEmpty) {
+            return Literal(JavaBoolean, randGenerator.nextBoolean)
+        }
+        val code : Int = randGenerator.nextInt(codeBound)
+        code match
+            case 0 => new Variable(boolVars(randGenerator.nextInt(boolVars.size)), JavaBoolean)
+            case 1 => new NegationResult(new Variable(boolVars(randGenerator.nextInt(boolVars.size)), JavaBoolean))
+            case 2 => new AndResult(randomCondition(vars, 2), randomCondition(vars, 2))
+            case 3 => new OrResult(randomCondition(vars, 2), randomCondition(vars, 2))
+    }
+
+    def randomGenerateHelper(vars: Map[String, Any], codeBound : Int = 5) : CodeModel = {
         val code = randGenerator.nextInt(codeBound)
         return code match
             case 0 => Display(randomType(vars))
@@ -124,11 +145,15 @@ object JavaTranslator extends ModelTranslator {
                 val times : Int = randGenerator.between(2,6)
                 val varName = "i" + vars.keySet.count(name=>name.startsWith("i"))
                 newVars.put(varName, JavaInt)
-                return Repetition(varName, JavaInt, times, randomGenerateHelper(newVars))
+                return Repetition(varName, JavaInt, times, randomGenerateHelper(newVars, 2))
             }
             case 3 => {
+                val newVars = vars.clone()
+                return Conditional(randomCondition(newVars), randomGenerateHelper(newVars, 3), None)
+            }
+            case 4 => {
                 val blockLength = randGenerator.between(1,10)
-                return CodeBlock((0 to blockLength map {(_:Int)=>randomGenerateHelper(vars,codeBound=3)}).toList)
+                return CodeBlock((0 to blockLength map {(_:Int)=>randomGenerateHelper(vars,codeBound=4)}).toList)
             }
     }
 
