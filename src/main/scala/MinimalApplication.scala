@@ -149,9 +149,9 @@ object MinimalApplication extends cask.MainRoutes{
 
     var problemsString = ""
     for (i <- 1 to numberOfProblems){
-      problemsString += problems(i-1).mkString("|")
+      problemsString += problems(i-1).mkString("|.|")
       if (i != numberOfProblems) {
-        problemsString += "|||"
+        problemsString += "|~|"
       }
     }
 

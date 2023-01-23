@@ -4,11 +4,11 @@ function renderQuestions(problemsString, responseType) {
 
     let responseTypesBank = ["multipleChoice", "freeResponse"]
 
-    let problems = problemsString.split("|||");
+    let problems = problemsString.split("|~|");
     let problems2dArr = [];
     let answersArr = []; 
     for (let i=0; i < problems.length; i++) {
-        let problem = problems[i].split("|")
+        let problem = problems[i].split("|.|")
         problems2dArr.push(problem);
         answersArr.push('v' + problem[6]);
     }
