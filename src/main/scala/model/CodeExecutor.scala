@@ -3,6 +3,7 @@ package model;
 import scala.jdk.CollectionConverters
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
+import scala.AnyRef.eq
 
 class CodeContext(private val outerScope : Option[CodeContext] = None) {
     private val data: Map[String,Any] = Map()
@@ -70,7 +71,7 @@ object CodeExecutor {
             return executeModel(model, CodeContext())
         } catch {
             case e: IllegalArgumentException => {
-                println(JavaTranslator.translateModel(model))
+                println("Error: " + e)
                 return CodeContext()
             }
         }
@@ -91,6 +92,17 @@ object CodeExecutor {
                 newContext.setVariable(argVar.variableName, getValue(context, arg), arg.getType)
                 return getValue(executeModel(body, newContext), returnRef)
             }
+            case Constructor(objType, method) => method(getValue(context, arg))
+        case EqualsResult(ref1, ref2, _) => getEquality(context, ref1, ref2)
+        case AndResult(ref1, ref2) => getValue(context, ref1) && getValue(context, ref2)
+        case OrResult(ref1, ref2) => getValue(context, ref1) || getValue(context, ref2)
+        case NegationResult(ref) => !getValue(context,ref)
+        
+    def getEquality[T,U](context : CodeContext, ref1 : Reference[T], ref2 : Reference[U]) = getValue(context,ref1) match
+        case x: AnyRef => getValue(context, ref2) match
+            case y: AnyRef => x eq y
+            case _ => getValue(context, ref1) == getValue(context, ref2)
+        case _ => getValue(context, ref1) == getValue(context, ref2)
 
     def executeModel(model: CodeModel, context: CodeContext) : CodeContext = {
         model match
@@ -112,6 +124,13 @@ object CodeExecutor {
             case VariableAssignment(variableName, ref) 
                 => context.setVariable(variableName, getValue(context, ref), ref.getType)
             case Display(ref) => context.addDisplayed(ref.getType.displayInstance(getValue(context, ref)))
+            case Conditional(condition, body, elseBody) => {
+                if(getValue(context, condition)) {
+                    executeModel(body, context)
+                } else if (elseBody.isDefined) {
+                    executeModel(elseBody.get, context)
+                }
+            }
             case _ => {}
         return context
     }
