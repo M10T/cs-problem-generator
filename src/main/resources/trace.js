@@ -1,3 +1,4 @@
+
 function renderQuestions(problemsString, responseType) {
     console.log(responseType);
 
@@ -22,8 +23,20 @@ function renderQuestions(problemsString, responseType) {
         let currentForm = document.createElement("form")
         currentForm.id = `problem${i}`
         let problem = problems2dArr[i]
+
+        let lineNumberCounter = 1;
+
         currentForm.innerHTML += `<b>Problem ${i+1}:</b><br/>`;
-        currentForm.innerHTML += problem[0].replace(/\n/g, "<br>").replace(/\t/g, "&emsp;"); 
+
+        problem[0] = problem[0].split("\n")
+
+        for (let j = 0; j < problem[0].length; j++) {
+            currentForm.innerHTML += "<i>" + lineNumberCounter + "</i>&emsp;" + problem[0][j].replace(/\t/g, "&emsp;") + "<br>"; 
+            lineNumberCounter ++;
+        }
+
+        //currentForm.innerHTML += problem[0].replace(/\n/g, replacer(lineNumberCounter)).replace(/\t/g, "&emsp;"); 
+        //currentForm.innerHTML += problem[0].replace(/\n/g, "<br><i>1. </i>").replace(/\t/g, "&emsp;"); 
         currentForm.innerHTML += "<p>What is displayed line " + problem[5] + "?</p>";
         if (currentResponseType == "multipleChoice") {
             currentForm.innerHTML += "<input type='radio' name='answers" + i + "' value = 'v1'>"+ problem[1] + "</input><br>";
@@ -55,4 +68,10 @@ function answerSubmit(answersArr, i, responseType) {
         window.alert(windowsMessage);
     }
     return false; 
+}
+
+function replacer(match, p1, offset, string, groups, lineNumberCounter) {
+    let replacement = "<br><i>" + lineNumberCounter + "</i>";
+    lineNumberCounter++
+    return replacement;
 }
