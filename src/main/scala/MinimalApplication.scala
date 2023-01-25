@@ -21,6 +21,9 @@ object MinimalApplication extends cask.MainRoutes{
           input(attr("type"):="radio", attr("id"):="problemTypeOne", attr("name"):="problemType", attr("value"):="trace"),
           label(attr("for"):="problemTypeOne")("Problem Type One: Tracing"),
           br(),
+          input(attr("type"):="radio", attr("id"):="problemTypeTwo", attr("name"):="problemType", attr("value"):="stringTrace"),
+          label(attr("for"):="problemTypeTwo")("Problem Type Two: String Tracing"),
+          br(),
           input(attr("type"):="radio", attr("id"):="randomCode", attr("name"):="problemType", attr("value"):="randomCode"),
           label(attr("for"):="randomCode")("Random Code Generator"),
           br(),
@@ -54,6 +57,7 @@ object MinimalApplication extends cask.MainRoutes{
     case "trace" => cask.Response(trace(responseType, numberOfProblems))
     case "mathCode" => cask.Response(mathTest())
     case "stringCode" => cask.Response(stringTest())
+    case "stringTrace" => cask.Response(stringTrace())
     case _ => cask.Response(html(), 401)
   
   @cask.get("/mathCode")
@@ -76,11 +80,37 @@ object MinimalApplication extends cask.MainRoutes{
 
   @cask.get("/stringCode")
   def stringTest() = {
-    val translated = JavaTranslator.translateModel(StringGenerator.randomGenerate())
+    val model = StringGenerator.randomGenerate()
+    val translated = JavaTranslator.translateModel(model)
+    val result = CodeExecutor.executeModel(model).getVariable("result", JavaBoolean)
     html(
       body(
         div(b("Code:"),
           translated.split("\n").map(x=>p(raw(x.replace("\t","&emsp;"))))),
+        p(raw(s"<b>Result: </b> $result"))
+      )
+    )
+  }
+
+  @cask.get("/stringTrace")
+  def stringTrace() = {
+    val model = StringGenerator.randomGenerate()
+    val translated = JavaTranslator.translateModel(model)
+    val result = CodeExecutor.executeModel(model).getVariable("result", JavaBoolean)
+    html(
+      body(
+        div(b("Code:"),
+          translated.split("\n").map(x=>p(raw(x.replace("\t","&emsp;"))))),
+        form(id:="q1",onsubmit := "return answerSubmit(1)",
+          p("What is the value of the result?"),
+          input(attr("type") := "radio", attr("value") := (if result then "Correct!" else "Incorrect."),
+          attr("name") :="answers1", "true"),
+          input(attr("type") := "radio", attr("value"):=(if result then "Incorrect." else "Correct!"),
+          attr("name"):="answers1","false"),
+          br(),
+          input(attr("type") := "submit")
+        ),
+        script(src:="static/stringtrace.js")
       )
     )
   }
